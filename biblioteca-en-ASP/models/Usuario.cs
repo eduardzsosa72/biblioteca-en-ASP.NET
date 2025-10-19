@@ -1,11 +1,13 @@
-﻿namespace BibliotecaApp.Core.Models
+﻿namespace biblioteca_en_ASP_NET.Models
 {
     public class Usuario
     {
-        public int Id { get; set; }
-        public int PersonaId { get; set; }
-        public string UserName { get; set; } // sAMAccountName o UPN
-        public string Email { get; set; }
-        public string Rol { get; set; } // "Administrador"|"Profesor"|"Estudiante"
+        private int id;
+        private string username;
+        private string rol;
+
+        public int Id { get => id; set => id = value; }
+        public string Username { get => username; set => username = value; }
+        public string Rol { get => rol; set => rol = value; }
     }
 }
