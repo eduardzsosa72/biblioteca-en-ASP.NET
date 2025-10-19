@@ -23,6 +23,18 @@ namespace biblioteca_en_ASP_NET.Controllers
         [HttpPost]
         public ActionResult Login(string email, string password)
         {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ViewBag.Error = "Debe ingresar correo y contraseña.";
+                return View();
+            }
+
+            if (_usuarioRepositorio == null)
+            {
+                ViewBag.Error = "Repositorio no inicializado.";
+                return View();
+            }
+
             var usuario = _usuarioRepositorio.ValidarUsuario(email, password);
 
             if (usuario == null)
@@ -34,10 +46,17 @@ namespace biblioteca_en_ASP_NET.Controllers
             Session["Usuario"] = usuario.Nombre;
             Session["Rol"] = usuario.Rol;
 
-            if (usuario.Rol == "Administrador")
-                return RedirectToAction("Dashboard", "Admin");
-            else
-                return RedirectToAction("Index", "Home");
+            switch (usuario.Rol)
+            {
+                case "Administrador":
+                    return RedirectToAction("Dashboard", "Admin");
+                case "Profesor":
+                case "Estudiante":
+                    return RedirectToAction("Index", "Home"); // o "Libro"
+                default:
+                    ViewBag.Error = "Rol no reconocido.";
+                    return View();
+            }
         }
 
         public ActionResult Logout()
