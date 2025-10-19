@@ -124,6 +124,14 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IRepository.cs" />
+    <Compile Include="Interfaces\IUsuarioRepositorio.cs" />
+    <Compile Include="Models\Estudiante.cs" />
+    <Compile Include="Models\Libro.cs" />
+    <Compile Include="Models\Persona.cs" />
+    <Compile Include="Models\Prestamo.cs" />
+    <Compile Include="Models\Profesor.cs" />
+    <Compile Include="Models\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -180,7 +188,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
