@@ -2,7 +2,6 @@
 using biblioteca_en_ASP_NET.Models;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace biblioteca_en_ASP_NET.Repositorios
 {
     public class UsuarioRepositorio : IUsuarioRepositorio
@@ -26,7 +25,7 @@ namespace biblioteca_en_ASP_NET.Repositorios
 
         public void Add(Usuario usuario)
         {
-            if (usuarios.Any(u => u.Username == usuario.Username))
+            if(usuarios.Any(u => u.Username == usuario.Username))
                 throw new System.Exception("El usuario ya existe");
             usuarios.Add(usuario);
         }
@@ -34,7 +33,7 @@ namespace biblioteca_en_ASP_NET.Repositorios
         public void Update(Usuario usuario)
         {
             var existing = GetById(usuario.Id);
-            if (existing != null)
+            if(existing != null)
             {
                 existing.Username = usuario.Username;
                 existing.Rol = usuario.Rol;
@@ -44,7 +43,7 @@ namespace biblioteca_en_ASP_NET.Repositorios
         public void Delete(int id)
         {
             var existing = GetById(id);
-            if (existing != null)
+            if(existing != null)
                 usuarios.Remove(existing);
         }
     }
