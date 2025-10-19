@@ -2,15 +2,14 @@
 
 namespace biblioteca_en_ASP_NET.Controllers
 {
-    public class HomeController : Controller
+    public class AdminController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Dashboard()
         {
-            if (Session["Usuario"] == null)
+            if (Session["Rol"] == null || Session["Rol"].ToString() != "Administrador")
                 return RedirectToAction("Login", "Account");
 
             ViewBag.Usuario = Session["Usuario"];
-            ViewBag.Rol = Session["Rol"];
             return View();
         }
     }

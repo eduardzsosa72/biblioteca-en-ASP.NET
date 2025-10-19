@@ -1,0 +1,28 @@
+﻿@model IEnumerable<biblioteca_en_ASP_NET.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Panel de Administración";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4">Usuarios del Sistema</h2>
+
+<table class="table table-striped shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.Nombre</td>
+                <td>@usuario.Correo</td>
+                <td>@usuario.Rol</td>
+            </tr>
+        }
+    </tbody>
+</table>

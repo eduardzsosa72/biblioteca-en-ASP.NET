@@ -3,11 +3,12 @@
     public class Usuario
     {
         private int id;
-        private string username;
+        private string nombre;
         private string rol;
-
-        public int Id { get => id; set => id = value; }
-        public string Username { get => username; set => username = value; }
-        public string Rol { get => rol; set => rol = value; }
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string Rol { get; set; }
+        public string Correo { get; set; }
+        public string Password { get; set; }
     }
 }

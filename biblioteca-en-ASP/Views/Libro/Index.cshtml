@@ -1,0 +1,29 @@
+﻿@model IEnumerable<biblioteca_en_ASP_NET.Models.Libro>
+
+<h2>Gestión de Libros</h2>
+
+<a href="/Libro/Crear">+ Agregar nuevo libro</a>
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>ISBN</th>
+        <th>Disponible</th>
+        <th>Acciones</th>
+    </tr>
+    @foreach (var libro in Model)
+    {
+        <tr>
+            <td>@libro.Id</td>
+            <td>@libro.Titulo</td>
+            <td>@libro.Autor</td>
+            <td>@libro.ISBN</td>
+            <td>@(libro.Disponible ? "Sí" : "No")</td>
+            <td>
+                <a href="/Libro/Editar/@libro.Id">Editar</a> |
+                <a href="/Libro/Eliminar/@libro.Id">Eliminar</a>
+            </td>
+        </tr>
+    }
+</table>
