@@ -1,0 +1,28 @@
+﻿@model biblioteca_en_ASP_NET.Models.Prestamo
+@{
+    ViewBag.Title = "Registrar Préstamo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Registrar Préstamo</h2>
+
+@using (Html.BeginForm("Crear", "Prestamo", FormMethod.Post))
+{
+    <div class="mb-3">
+        @Html.LabelFor(m => m.UsuarioId)
+        @Html.TextBoxFor(m => m.UsuarioId, new { @class = "form-control" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.LibroId)
+        @Html.TextBoxFor(m => m.LibroId, new { @class = "form-control" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.FechaPrestamo)
+        @Html.TextBoxFor(m => m.FechaPrestamo, new { @class = "form-control", type = "date" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.FechaDevolucion)
+        @Html.TextBoxFor(m => m.FechaDevolucion, new { @class = "form-control", type = "date" })
+    </div>
+    <button type="submit" class="btn btn-success">Registrar</button>
+}

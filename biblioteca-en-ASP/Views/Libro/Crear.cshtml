@@ -1,0 +1,28 @@
+﻿@model biblioteca_en_ASP_NET.Models.Libro
+@{
+    ViewBag.Title = "Agregar Libro";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Agregar Libro</h2>
+
+@using (Html.BeginForm("Crear", "Libro", FormMethod.Post))
+{
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Titulo)
+        @Html.TextBoxFor(m => m.Titulo, new { @class = "form-control" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Autor)
+        @Html.TextBoxFor(m => m.Autor, new { @class = "form-control" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.ISBN)
+        @Html.TextBoxFor(m => m.ISBN, new { @class = "form-control" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Cantidad)
+        @Html.TextBoxFor(m => m.Cantidad, new { @class = "form-control" })
+    </div>
+    <button type="submit" class="btn btn-success">Guardar</button>
+}

@@ -1,34 +1,31 @@
 ﻿@model IEnumerable<biblioteca_en_ASP_NET.Models.Prestamo>
+@{
+    ViewBag.Title = "Préstamos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<h2>Préstamos Registrados</h2>
+<h2>Préstamos</h2>
 
-<a href="/Prestamo/Crear">Registrar nuevo préstamo</a>
+<a href="@Url.Action("Crear","Prestamo")" class="btn btn-success mb-3">Registrar Préstamo</a>
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>ID</th>
-        <th>Usuario</th>
-        <th>ID Libro</th>
-        <th>Fecha Préstamo</th>
-        <th>Devolución Esperada</th>
-        <th>Devolución Real</th>
-        <th>Acción</th>
-    </tr>
-    @foreach (var p in Model)
-    {
+<table class="table table-striped">
+    <thead class="table-dark">
         <tr>
-            <td>@p.Id</td>
-            <td>@p.UsuarioCorreo</td>
-            <td>@p.LibroId</td>
-            <td>@p.FechaPrestamo</td>
-            <td>@p.FechaDevolucionEsperada</td>
-            <td>@(p.FechaDevolucionReal?.ToString() ?? "Pendiente")</td>
-            <td>
-                @if (p.FechaDevolucionReal == null)
-                {
-                    <a href="/Prestamo/Devolver/@p.Id">Devolver</a>
-                }
-            </td>
+            <th>Libro</th>
+            <th>Usuario</th>
+            <th>Fecha Préstamo</th>
+            <th>Fecha Devolución</th>
         </tr>
-    }
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.Libro.Titulo</td>
+                <td>@p.Usuario.Nombre</td>
+                <td>@p.FechaPrestamo.ToShortDateString()</td>
+                <td>@p.FechaDevolucion.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
 </table>

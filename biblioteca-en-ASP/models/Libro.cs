@@ -17,6 +17,8 @@ namespace biblioteca_en_ASP_NET.Models
         [RegularExpression(@"^97[89]-\d{1,5}-\d{1,7}-\d{1,7}-\d{1}$", ErrorMessage = "Formato ISBN inválido. Ejemplo: 978-3-16-148410-0")]
         public string ISBN { get; set; }
 
+        public int Cantidad { get; set; }
+
         public bool Disponible { get; set; } = true;
     }
 }

@@ -3,7 +3,9 @@
     public class Usuario
     {
         private int id;
+
         private string nombre;
+
         private string rol;
         public int Id { get; set; }
         public string Nombre { get; set; }

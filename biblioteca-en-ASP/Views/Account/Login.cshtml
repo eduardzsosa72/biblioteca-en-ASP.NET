@@ -1,6 +1,6 @@
 ﻿@{
-    ViewData["Title"] = "Iniciar Sesión";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Iniciar Sesión";
 }
 
 <div class="row justify-content-center">
@@ -8,21 +8,24 @@
         <div class="card shadow-lg border-0 mt-5">
             <div class="card-body">
                 <h4 class="text-center mb-4">Iniciar Sesión</h4>
-                <form asp-action="Login" method="post">
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+                {
                     <div class="mb-3">
-                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <label>Correo Electrónico</label>
                         <input type="text" name="email" class="form-control" required />
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
+                        <label>Contraseña</label>
                         <input type="password" name="password" class="form-control" required />
                     </div>
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
                     <button type="submit" class="btn btn-primary w-100">Entrar</button>
-                </form>
+                }
             </div>
         </div>
     </div>

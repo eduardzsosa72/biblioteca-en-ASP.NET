@@ -1,41 +1,43 @@
-﻿using biblioteca_en_ASP_NET.Interfaces;
+﻿using System.Collections.Generic;
 using biblioteca_en_ASP_NET.Models;
-using System.Collections.Generic;
+using biblioteca_en_ASP_NET.Interfaces;
 using System.Linq;
 
 namespace biblioteca_en_ASP_NET.Repositorios
 {
     public class LibroRepositorio : ILibroRepositorio
     {
-        private static List<Libro> libros = new List<Libro>
+        private static List<Libro> libros = new List<Libro>();
+
+        public IEnumerable<Libro> ObtenerLibros()
         {
-            new Libro { Id = 1, Titulo = "Cien años de soledad", Autor = "Gabriel García Márquez", ISBN = "978-3-16-148410-0", Disponible = true },
-            new Libro { Id = 2, Titulo = "El Principito", Autor = "Antoine de Saint-Exupéry", ISBN = "978-0-14-132872-2", Disponible = true }
-        };
+            return libros;
+        }
 
-        public IEnumerable<Libro> ObtenerTodos() => libros;
-
-        public Libro ObtenerPorId(int id) => libros.FirstOrDefault(l => l.Id == id);
-
-        public void Agregar(Libro libro)
+        public Libro ObtenerPorId(int id)
         {
-            libro.Id = libros.Count + 1;
+            return libros.FirstOrDefault(l => l.Id == id);
+        }
+
+        public void AgregarLibro(Libro libro)
+        {
+            libro.Id = libros.Count > 0 ? libros.Max(l => l.Id) + 1 : 1;
             libros.Add(libro);
         }
 
-        public void Editar(Libro libro)
+        public void ActualizarLibro(Libro libro)
         {
-            var existente = ObtenerPorId(libro.Id);
-            if (existente != null)
+            var l = ObtenerPorId(libro.Id);
+            if (l != null)
             {
-                existente.Titulo = libro.Titulo;
-                existente.Autor = libro.Autor;
-                existente.ISBN = libro.ISBN;
-                existente.Disponible = libro.Disponible;
+                l.Titulo = libro.Titulo;
+                l.Autor = libro.Autor;
+                l.ISBN = libro.ISBN;
+                l.Cantidad = libro.Cantidad;
             }
         }
 
-        public void Eliminar(int id)
+        public void EliminarLibro(int id)
         {
             var libro = ObtenerPorId(id);
             if (libro != null)

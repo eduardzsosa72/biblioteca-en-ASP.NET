@@ -1,17 +1,23 @@
 ﻿using System.Web.Mvc;
-using biblioteca_en_ASP_NET.Interfaces;
 using biblioteca_en_ASP_NET.Models;
+using biblioteca_en_ASP_NET.Interfaces;
 using biblioteca_en_ASP_NET.Repositorios;
+using System.Collections.Generic;
 
 namespace biblioteca_en_ASP_NET.Controllers
 {
     public class PrestamoController : Controller
     {
-        private readonly IPrestamoRepositorio _repo = new PrestamoRepositorio();
+        private readonly IPrestamoRepositorio _prestamoRepositorio;
+
+        public PrestamoController()
+        {
+            _prestamoRepositorio = new PrestamoRepositorio();
+        }
 
         public ActionResult Index()
         {
-            var prestamos = _repo.ObtenerTodos();
+            var prestamos = _prestamoRepositorio.ObtenerPrestamos() ?? new List<Prestamo>();
             return View(prestamos);
         }
 
@@ -24,15 +30,12 @@ namespace biblioteca_en_ASP_NET.Controllers
         [HttpPost]
         public ActionResult Crear(Prestamo prestamo)
         {
-            prestamo.UsuarioCorreo = Session["Usuario"]?.ToString();
-            _repo.Registrar(prestamo);
-            return RedirectToAction("Index");
-        }
-
-        public ActionResult Devolver(int id)
-        {
-            _repo.DevolverLibro(id);
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _prestamoRepositorio.AgregarPrestamo(prestamo);
+                return RedirectToAction("Index");
+            }
+            return View(prestamo);
         }
     }
 }

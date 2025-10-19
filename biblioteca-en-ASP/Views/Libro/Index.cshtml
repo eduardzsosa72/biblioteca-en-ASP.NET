@@ -1,29 +1,35 @@
 ﻿@model IEnumerable<biblioteca_en_ASP_NET.Models.Libro>
+@{
+    ViewBag.Title = "Libros";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<h2>Gestión de Libros</h2>
+<h2>Libros disponibles</h2>
 
-<a href="/Libro/Crear">+ Agregar nuevo libro</a>
-<table border="1" cellpadding="5">
-    <tr>
-        <th>ID</th>
-        <th>Título</th>
-        <th>Autor</th>
-        <th>ISBN</th>
-        <th>Disponible</th>
-        <th>Acciones</th>
-    </tr>
-    @foreach (var libro in Model)
-    {
+<a href="@Url.Action("Crear", "Libro")" class="btn btn-success mb-3">Agregar Libro</a>
+
+<table class="table table-striped">
+    <thead class="table-dark">
         <tr>
-            <td>@libro.Id</td>
-            <td>@libro.Titulo</td>
-            <td>@libro.Autor</td>
-            <td>@libro.ISBN</td>
-            <td>@(libro.Disponible ? "Sí" : "No")</td>
-            <td>
-                <a href="/Libro/Editar/@libro.Id">Editar</a> |
-                <a href="/Libro/Eliminar/@libro.Id">Eliminar</a>
-            </td>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>ISBN</th>
+            <th>Cantidad</th>
+            <th>Acciones</th>
         </tr>
-    }
+    </thead>
+    <tbody>
+        @foreach (var libro in Model)
+        {
+            <tr>
+                <td>@libro.Titulo</td>
+                <td>@libro.Autor</td>
+                <td>@libro.ISBN</td>
+                <td>@libro.Cantidad</td>
+                <td>
+                    <a href="@Url.Action("Editar","Libro", new { id = libro.Id })" class="btn btn-sm btn-primary">Editar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
