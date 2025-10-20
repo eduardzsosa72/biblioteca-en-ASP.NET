@@ -1,21 +1,9 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Iniciar Sesión";
-}
-
-<div class="row justify-content-center">
+﻿<div class="row justify-content-center">
     <div class="col-md-5">
         <div class="card shadow-lg border-0 mt-5">
             <div class="card-body">
                 <h4 class="text-center mb-4">Iniciar Sesión</h4>
-
-                @if (ViewBag.Error != null)
-                {
-                    <div class="alert alert-danger">@ViewBag.Error</div>
-                }
-
-                @using (Html.BeginForm("Login", "Account", FormMethod.Post))
-                {
+                <form action="/Account/Login" method="post">
                     <div class="mb-3">
                         <label>Correo Electrónico</label>
                         <input type="text" name="email" class="form-control" required />
@@ -24,8 +12,18 @@
                         <label>Contraseña</label>
                         <input type="password" name="password" class="form-control" required />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
-                }
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    <button type="submit" class="btn btn-primary w-100 mb-2">Entrar</button>
+                </form>
+
+                <hr />
+
+                <form action="/Account/RegistrarPerfil" method="get">
+                    <button type="submit" class="btn btn-secondary w-100">Registrar Perfil</button>
+                </form>
             </div>
         </div>
     </div>

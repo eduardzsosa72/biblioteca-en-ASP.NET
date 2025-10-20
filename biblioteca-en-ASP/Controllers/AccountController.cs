@@ -1,61 +1,103 @@
 ﻿using biblioteca_en_ASP_NET.Interfaces;
 using biblioteca_en_ASP_NET.Repositorios;
 using biblioteca_en_ASP_NET.Servicios;
+using biblioteca_en_ASP_NET.Models;
+using System;
+using System.Reflection;
 using System.Web.Mvc;
 
-namespace biblioteca_en_ASP_NET.Controllers
+
+
+public class AccountController : Controller
 {
-    public class AccountController : Controller
+    private readonly IUsuarioRepositorio _usuarioRepositorio;
+    private readonly ActiveDirectoryService _adService;
+
+    public AccountController()
     {
-        private readonly IUsuarioRepositorio _usuarioRepositorio;
-        private readonly ActiveDirectoryService _adService;
+        _usuarioRepositorio = new UsuarioRepositorio();
+        _adService = new ActiveDirectoryService("gokupelonadmin.com");
+    }
 
-        public AccountController()
-        {
-            _usuarioRepositorio = new UsuarioRepositorio();
-            _adService = new ActiveDirectoryService("gokupelonadmin.com");
-        }
+    [HttpGet]
+    public ActionResult Login()
+    {
+        return View();
+    }
 
-        [HttpGet]
-        public ActionResult Login()
+    [HttpPost]
+    public ActionResult Login(string email, string password)
+    {
+        // Validar en Active Directory
+        if (!_adService.ValidarAD(email, password))
         {
+            ViewBag.Error = "Usuario o contraseña incorrectos en Active Directory.";
             return View();
         }
 
-        [HttpPost]
-        public ActionResult Login(string email, string password)
+        // Buscar usuario en la DB
+        var usuario = _usuarioRepositorio.ValidarUsuario(email, password);
+
+        if (usuario == null)
         {
-            // Validar en Active Directory
-            if (!_adService.ValidarAD(email, password))
-            {
-                ViewBag.Error = "Usuario o contraseña incorrectos en Active Directory.";
-                return View();
-            }
-
-            // Buscar usuario en DB para rol
-            var usuario = _usuarioRepositorio.ValidarUsuario(email, password);
-            if (usuario == null)
-            {
-                ViewBag.Error = "Usuario no registrado en la base de datos.";
-                return View();
-            }
-
-            Session["Usuario"] = usuario.Nombre;
-            Session["Rol"] = usuario.Rol;
-
-            // Redirigir según rol
-            if (usuario.Rol == "Administrador")
-                return RedirectToAction("Dashboard", "Admin");
-            else if (usuario.Rol == "Profesor")
-                return RedirectToAction("Dashboard", "Profesor");
-            else
-                return RedirectToAction("Dashboard", "Estudiante");
+            // Redirigir a registro de perfil
+            TempData["EmailAD"] = email;  // pasar email a la vista de registro
+            TempData["PasswordAD"] = password;
+            return RedirectToAction("RegistrarPerfil");
         }
 
-        public ActionResult Logout()
+        // Guardar sesión
+        Session["Usuario"] = usuario.Nombre;
+        Session["Rol"] = usuario.Rol;
+
+        // Redirigir según rol
+        return RedirectToAction("Dashboard", usuario.Rol);
+    }
+
+    [HttpGet]
+    public ActionResult RegistrarPerfil()
+    {
+        ViewBag.Email = TempData["EmailAD"];
+        ViewBag.Password = TempData["PasswordAD"];
+        return View();
+    }
+
+    [HttpPost]
+    public ActionResult RegistrarPerfil(string nombre, string apellido, string email, string password)
+    {
+        if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellido))
         {
-            Session.Clear();
-            return RedirectToAction("Login");
+            ViewBag.Error = "Nombre y apellido son obligatorios.";
+            return View();
         }
+
+        // Crear persona
+        var personaId = _usuarioRepositorio.CrearPersona(new Persona
+        {
+            Nombre = nombre,
+            Apellido = apellido,
+            Correo = email,
+            FechaNacimiento = DateTime.Now,
+            TipoPersona = "Estudiante"
+        });
+
+        _usuarioRepositorio.CrearUsuario(new Usuario
+        {
+            PersonaId = personaId,
+            Rol = "Estudiante",
+            Password = password
+        });
+
+        // Guardar sesión
+        Session["Usuario"] = nombre;
+        Session["Rol"] = "Estudiante";
+
+        return RedirectToAction("Dashboard", "Estudiante");
+    }
+
+    public ActionResult Logout()
+    {
+        Session.Clear();
+        return RedirectToAction("Login");
     }
 }

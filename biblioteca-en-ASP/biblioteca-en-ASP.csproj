@@ -252,6 +252,7 @@
     <Content Include="Views\Profesor\Dashboard.cshtml" />
     <Content Include="Views\Estudiante\Dashboard.cshtml" />
     <Content Include="Views\Inicio\Index.cshtml" />
+    <Content Include="Views\Account\RegistrarPerfil.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
