@@ -11,14 +11,30 @@
                 <form action="/Account/RegistrarPerfil" method="post">
                     <div class="mb-3">
                         <label>Nombre</label>
-                        <input type="text" name="nombre" class="form-control" required />
+                        <input type="text" name="Nombre" class="form-control" required />
                     </div>
                     <div class="mb-3">
                         <label>Apellido</label>
-                        <input type="text" name="apellido" class="form-control" required />
+                        <input type="text" name="Nombre" class="form-control" required />
                     </div>
-                    <input type="hidden" name="email" value="@ViewBag.Email" />
-                    <input type="hidden" name="password" value="@ViewBag.Password" />
+                    <div class="mb-3">
+                        <label>Fecha de Nacimiento</label>
+                        <input type="date" name="fechaNacimiento" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Correo</label>
+                        <input type="email" name="Correo" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Contraseña</label>
+                        <input type="password" name="Password" class="form-control" required />
+                    </div>
+
+                    <!-- Campo oculto si se está editando un usuario existente -->
+                    <input type="hidden" name="Id" value="@ViewBag.Id" />
+
 
                     @if (ViewBag.Error != null)
                     {

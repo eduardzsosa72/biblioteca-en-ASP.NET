@@ -40,5 +40,6 @@ namespace biblioteca_en_ASP_NET.Repositorios
         {
             return _usuarios.FirstOrDefault(u => u.Id == id);
         }
+
     }
 }

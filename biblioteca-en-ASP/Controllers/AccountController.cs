@@ -58,12 +58,12 @@ public class AccountController : Controller
     public ActionResult RegistrarPerfil()
     {
         ViewBag.Email = TempData["EmailAD"];
-        ViewBag.Password = TempData["PasswordAD"];
+       ViewBag.Password = TempData["PasswordAD"];
         return View();
     }
 
     [HttpPost]
-    public ActionResult RegistrarPerfil(string nombre, string apellido, string email, string password)
+    public ActionResult RegistrarPerfil(string nombre, string apellido,DateTime FechaNacimiento, string email, string password)
     {
         if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellido))
         {
@@ -77,7 +77,7 @@ public class AccountController : Controller
             Nombre = nombre,
             Apellido = apellido,
             Correo = email,
-            FechaNacimiento = DateTime.Now,
+            FechaNacimiento =FechaNacimiento,
             TipoPersona = "Estudiante"
         });
 
