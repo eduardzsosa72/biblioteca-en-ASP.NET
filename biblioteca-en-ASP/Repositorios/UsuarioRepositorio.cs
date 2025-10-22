@@ -1,32 +1,28 @@
-﻿using biblioteca_en_ASP_NET.Models;
-using biblioteca_en_ASP_NET.Interfaces;
+﻿using biblioteca_en_ASP_NET.Interfaces;
+using biblioteca_en_ASP_NET.Models;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data.SqlClient;
 using System.Configuration;
-
 
 namespace biblioteca_en_ASP_NET.Repositorios
 {
     public class UsuarioRepositorio : IUsuarioRepositorio
     {
-        private readonly string _connectionString;
-
-        public UsuarioRepositorio()
-        {
-            _connectionString = ConfigurationManager.ConnectionStrings["ConexionSQL"].ConnectionString;
-        }
+        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["BibliotecaDB"].ConnectionString;
 
         public Usuario ValidarUsuario(string correo, string password)
         {
             Usuario usuario = null;
-
-            using (var conexion = new SqlConnection(_connectionString))
+            using (var con = new SqlConnection(_connectionString))
             {
-                conexion.Open();
-                var query = "SELECT * FROM Usuarios WHERE Correo = @Correo AND Password = @Password";
+                con.Open();
+                var query = @"SELECT u.Id, u.PersonaId, u.Rol, u.Password,
+                                     p.Nombre, p.Apellido, p.Correo
+                              FROM Usuarios u
+                              INNER JOIN Personas p ON u.PersonaId = p.Id
+                              WHERE p.Correo = @Correo AND u.Password = @Password";
 
-                using (var cmd = new SqlCommand(query, conexion))
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Correo", correo);
                     cmd.Parameters.AddWithValue("@Password", password);
@@ -39,27 +35,33 @@ namespace biblioteca_en_ASP_NET.Repositorios
                             {
                                 Id = (int)reader["Id"],
                                 PersonaId = (int)reader["PersonaId"],
-                                Correo = reader["Correo"].ToString(),
+                                Rol = reader["Rol"].ToString(),
                                 Password = reader["Password"].ToString(),
-                                Rol = reader["Rol"].ToString()
+                                Persona = new Persona
+                                {
+                                    Nombre = reader["Nombre"].ToString(),
+                                    Apellido = reader["Apellido"].ToString(),
+                                    Correo = reader["Correo"].ToString()
+                                }
                             };
                         }
                     }
                 }
             }
-
             return usuario;
         }
 
         public IEnumerable<Usuario> ObtenerUsuarios()
         {
             var lista = new List<Usuario>();
-
-            using (var conexion = new SqlConnection(_connectionString))
+            using (var con = new SqlConnection(_connectionString))
             {
-                conexion.Open();
-                var query = "SELECT * FROM Usuarios";
-                using (var cmd = new SqlCommand(query, conexion))
+                con.Open();
+                var query = @"SELECT u.Id, u.PersonaId, u.Rol, p.Nombre, p.Apellido, p.Correo
+                              FROM Usuarios u
+                              INNER JOIN Personas p ON u.PersonaId = p.Id";
+
+                using (var cmd = new SqlCommand(query, con))
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -68,26 +70,32 @@ namespace biblioteca_en_ASP_NET.Repositorios
                         {
                             Id = (int)reader["Id"],
                             PersonaId = (int)reader["PersonaId"],
-                            Correo = reader["Correo"].ToString(),
-                            Rol = reader["Rol"].ToString()
+                            Rol = reader["Rol"].ToString(),
+                            Persona = new Persona
+                            {
+                                Nombre = reader["Nombre"].ToString(),
+                                Apellido = reader["Apellido"].ToString(),
+                                Correo = reader["Correo"].ToString()
+                            }
                         });
                     }
                 }
             }
-
             return lista;
         }
 
-       
         public Usuario ObtenerPorId(int id)
         {
             Usuario usuario = null;
-
-            using (var conexion = new SqlConnection(_connectionString))
+            using (var con = new SqlConnection(_connectionString))
             {
-                conexion.Open();
-                var query = "SELECT * FROM Usuarios WHERE Id = @Id";
-                using (var cmd = new SqlCommand(query, conexion))
+                con.Open();
+                var query = @"SELECT u.Id, u.PersonaId, u.Rol, p.Nombre, p.Apellido, p.Correo
+                              FROM Usuarios u
+                              INNER JOIN Personas p ON u.PersonaId = p.Id
+                              WHERE u.Id = @Id";
+
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
                     using (var reader = cmd.ExecuteReader())
@@ -98,30 +106,31 @@ namespace biblioteca_en_ASP_NET.Repositorios
                             {
                                 Id = (int)reader["Id"],
                                 PersonaId = (int)reader["PersonaId"],
-                                Correo = reader["Correo"].ToString(),
-                                Rol = reader["Rol"].ToString()
+                                Rol = reader["Rol"].ToString(),
+                                Persona = new Persona
+                                {
+                                    Nombre = reader["Nombre"].ToString(),
+                                    Apellido = reader["Apellido"].ToString(),
+                                    Correo = reader["Correo"].ToString()
+                                }
                             };
                         }
                     }
                 }
             }
-
             return usuario;
         }
 
-      
         public int CrearPersona(Persona persona)
         {
             int personaId = 0;
-
-            using (var conexion = new SqlConnection(_connectionString))
+            using (var con = new SqlConnection(_connectionString))
             {
-                conexion.Open();
+                con.Open();
                 var query = @"INSERT INTO Personas (Nombre, Apellido, Correo, FechaNacimiento, TipoPersona)
                               OUTPUT INSERTED.Id
-                              VALUES (@Nombre, @Apellido, @Correo, @FechaNacimiento, @TipoPersona)";
-
-                using (var cmd = new SqlCommand(query, conexion))
+                              VALUES (@Nombre,@Apellido,@Correo,@FechaNacimiento,@TipoPersona)";
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Nombre", persona.Nombre);
                     cmd.Parameters.AddWithValue("@Apellido", persona.Apellido);
@@ -132,26 +141,21 @@ namespace biblioteca_en_ASP_NET.Repositorios
                     personaId = (int)cmd.ExecuteScalar();
                 }
             }
-
             return personaId;
         }
 
-     
         public void CrearUsuario(Usuario usuario)
         {
-            using (var conexion = new SqlConnection(_connectionString))
+            using (var con = new SqlConnection(_connectionString))
             {
-                conexion.Open();
-                var query = @"INSERT INTO Usuarios (PersonaId, Correo, Password, Rol)
-                              VALUES (@PersonaId, @Correo, @Password, @Rol)";
-
-                using (var cmd = new SqlCommand(query, conexion))
+                con.Open();
+                var query = @"INSERT INTO Usuarios (PersonaId, Rol, Password)
+                              VALUES (@PersonaId,@Rol,@Password)";
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@PersonaId", usuario.PersonaId);
-                    cmd.Parameters.AddWithValue("@Correo", usuario.Correo);
-                    cmd.Parameters.AddWithValue("@Password", usuario.Password);
                     cmd.Parameters.AddWithValue("@Rol", usuario.Rol);
-
+                    cmd.Parameters.AddWithValue("@Password", usuario.Password);
                     cmd.ExecuteNonQuery();
                 }
             }

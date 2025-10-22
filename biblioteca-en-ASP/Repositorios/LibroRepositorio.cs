@@ -1,91 +1,53 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlClient;
-using biblioteca_en_ASP_NET.Interfaces;
+﻿using biblioteca_en_ASP_NET.Interfaces;
 using biblioteca_en_ASP_NET.Models;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Configuration;
 
 namespace biblioteca_en_ASP_NET.Repositorios
 {
     public class LibroRepositorio : ILibroRepositorio
     {
-        private readonly string _connectionString;
-
-        public LibroRepositorio()
-        {
-            _connectionString = ConfigurationManager.ConnectionStrings["ConexionSQL"].ConnectionString;
-        }
+        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["BibliotecaDB"].ConnectionString;
 
         public IEnumerable<Libro> ObtenerLibros()
         {
-            var libros = new List<Libro>();
-
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            var lista = new List<Libro>();
+            using (var con = new SqlConnection(_connectionString))
             {
                 con.Open();
-                string query = "SELECT Id, Titulo, Autor, Genero, Cantidad FROM Libros";
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                var query = "SELECT * FROM Libros";
+                using (var cmd = new SqlCommand(query, con))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    while (dr.Read())
+                    while (reader.Read())
                     {
-                        libros.Add(new Libro
+                        lista.Add(new Libro
                         {
-                            Id = (int)dr["Id"],
-                            Titulo = dr["Titulo"].ToString(),
-                            Autor = dr["Autor"].ToString(),
-                            Genero = dr["Genero"].ToString(),
-                            Cantidad = (int)dr["Cantidad"]
+                            Id = (int)reader["Id"],
+                            Titulo = reader["Titulo"].ToString(),
+                            Autor = reader["Autor"].ToString(),
+                            ISBN = reader["ISBN"].ToString(),
+                            Cantidad = (int)reader["Cantidad"]
                         });
                     }
                 }
             }
-
-            return libros;
-        }
-
-        public Libro ObtenerPorId(int id)
-        {
-            Libro libro = null;
-
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                con.Open();
-                string query = "SELECT Id, Titulo, Autor, Genero, Cantidad FROM Libros WHERE Id = @Id";
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    using (SqlDataReader dr = cmd.ExecuteReader())
-                    {
-                        if (dr.Read())
-                        {
-                            libro = new Libro
-                            {
-                                Id = (int)dr["Id"],
-                                Titulo = dr["Titulo"].ToString(),
-                                Autor = dr["Autor"].ToString(),
-                                Genero = dr["Genero"].ToString(),
-                                Cantidad = (int)dr["Cantidad"]
-                            };
-                        }
-                    }
-                }
-            }
-
-            return libro;
+            return lista;
         }
 
         public void AgregarLibro(Libro libro)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (var con = new SqlConnection(_connectionString))
             {
                 con.Open();
-                string query = @"INSERT INTO Libros (Titulo, Autor, Genero, Cantidad)
-                                 VALUES (@Titulo, @Autor, @Genero, @Cantidad)";
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                var query = @"INSERT INTO Libros (Titulo, Autor, ISBN, Cantidad)
+                              VALUES (@Titulo,@Autor,@ISBN,@Cantidad)";
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Titulo", libro.Titulo);
                     cmd.Parameters.AddWithValue("@Autor", libro.Autor);
-                    cmd.Parameters.AddWithValue("@Genero", libro.Genero);
+                    cmd.Parameters.AddWithValue("@ISBN", libro.ISBN);
                     cmd.Parameters.AddWithValue("@Cantidad", libro.Cantidad);
                     cmd.ExecuteNonQuery();
                 }
@@ -94,36 +56,50 @@ namespace biblioteca_en_ASP_NET.Repositorios
 
         public void ActualizarLibro(Libro libro)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (var con = new SqlConnection(_connectionString))
             {
                 con.Open();
-                string query = @"UPDATE Libros 
-                                 SET Titulo = @Titulo, Autor = @Autor, Genero = @Genero, Cantidad = @Cantidad
-                                 WHERE Id = @Id";
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                var query = @"UPDATE Libros SET Titulo=@Titulo, Autor=@Autor, ISBN=@ISBN, Cantidad=@Cantidad
+                              WHERE Id=@Id";
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Id", libro.Id);
                     cmd.Parameters.AddWithValue("@Titulo", libro.Titulo);
                     cmd.Parameters.AddWithValue("@Autor", libro.Autor);
-                    cmd.Parameters.AddWithValue("@Genero", libro.Genero);
+                    cmd.Parameters.AddWithValue("@ISBN", libro.ISBN);
                     cmd.Parameters.AddWithValue("@Cantidad", libro.Cantidad);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        public void EliminarLibro(int id)
+        public Libro ObtenerPorId(int id)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            Libro libro = null;
+            using (var con = new SqlConnection(_connectionString))
             {
                 con.Open();
-                string query = "DELETE FROM Libros WHERE Id = @Id";
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                var query = "SELECT * FROM Libros WHERE Id=@Id";
+                using (var cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
-                    cmd.ExecuteNonQuery();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            libro = new Libro
+                            {
+                                Id = (int)reader["Id"],
+                                Titulo = reader["Titulo"].ToString(),
+                                Autor = reader["Autor"].ToString(),
+                                ISBN = reader["ISBN"].ToString(),
+                                Cantidad = (int)reader["Cantidad"]
+                            };
+                        }
+                    }
                 }
             }
+            return libro;
         }
     }
 }

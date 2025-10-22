@@ -2,14 +2,11 @@
 {
     public class Usuario
     {
-        private int id;
-        private string nombre;
-        private string rol;
         public int Id { get; set; }
-        public string Nombre { get; set; }
+        public int PersonaId { get; set; }
         public string Rol { get; set; }
-        public string Correo { get; set; }
         public string Password { get; set; }
-        public int PersonaId { get; set; } // <-- Agregar esta propiedad
+
+        public Persona Persona { get; set; } // Información de la persona
     }
 }

@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using biblioteca_en_ASP_NET.Models;
+﻿using biblioteca_en_ASP_NET.Models;
+using System.Collections.Generic;
 
 namespace biblioteca_en_ASP_NET.Interfaces
 {
     public interface ILibroRepositorio
     {
         IEnumerable<Libro> ObtenerLibros();
-        Libro ObtenerPorId(int id);
         void AgregarLibro(Libro libro);
         void ActualizarLibro(Libro libro);
-        void EliminarLibro(int id);
+        Libro ObtenerPorId(int id);
     }
 }

@@ -1,12 +1,9 @@
-﻿using biblioteca_en_ASP_NET.Interfaces;
-using biblioteca_en_ASP_NET.Repositorios;
-using biblioteca_en_ASP_NET.Servicios;
-using biblioteca_en_ASP_NET.Models;
-using System;
-using System.Reflection;
+﻿using System;
 using System.Web.Mvc;
-
-
+using biblioteca_en_ASP_NET.Interfaces;
+using biblioteca_en_ASP_NET.Repositorios;
+using biblioteca_en_ASP_NET.Models;
+using biblioteca_en_ASP_NET.Servicios;
 
 public class AccountController : Controller
 {
@@ -35,35 +32,46 @@ public class AccountController : Controller
             return View();
         }
 
-        // Buscar usuario en la DB
+        // Buscar usuario en la base de datos
         var usuario = _usuarioRepositorio.ValidarUsuario(email, password);
 
         if (usuario == null)
         {
-            // Redirigir a registro de perfil
-            TempData["EmailAD"] = email;  // pasar email a la vista de registro
+            // Redirigir a registro de perfil si no existe
+            TempData["EmailAD"] = email;
             TempData["PasswordAD"] = password;
             return RedirectToAction("RegistrarPerfil");
         }
 
         // Guardar sesión
-        Session["Usuario"] = usuario.Nombre;
+        Session["Usuario"] = usuario.Persona.Nombre;
         Session["Rol"] = usuario.Rol;
 
         // Redirigir según rol
-        return RedirectToAction("Dashboard", usuario.Rol);
+        switch (usuario.Rol)
+        {
+            case "Administrador":
+                return RedirectToAction("Dashboard", "Admin"); // AdminController
+            case "Profesor":
+                return RedirectToAction("Dashboard", "Profesor"); // ProfesorController
+            case "Estudiante":
+                return RedirectToAction("Dashboard", "Estudiante"); // EstudianteController
+            default:
+                ViewBag.Error = "Rol no válido";
+                return View("Login");
+        }
     }
 
     [HttpGet]
     public ActionResult RegistrarPerfil()
     {
         ViewBag.Email = TempData["EmailAD"];
-       ViewBag.Password = TempData["PasswordAD"];
+        ViewBag.Password = TempData["PasswordAD"];
         return View();
     }
 
     [HttpPost]
-    public ActionResult RegistrarPerfil(string nombre, string apellido,DateTime FechaNacimiento, string email, string password)
+    public ActionResult RegistrarPerfil(string nombre, string apellido, DateTime FechaNacimiento, string email, string password)
     {
         if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(apellido))
         {
@@ -77,10 +85,11 @@ public class AccountController : Controller
             Nombre = nombre,
             Apellido = apellido,
             Correo = email,
-            FechaNacimiento =FechaNacimiento,
+            FechaNacimiento = FechaNacimiento,
             TipoPersona = "Estudiante"
         });
 
+        // Crear usuario
         _usuarioRepositorio.CrearUsuario(new Usuario
         {
             PersonaId = personaId,
