@@ -1,60 +1,72 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using biblioteca_en_ASP_NET.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using biblioteca_en_ASP_NET.Interfaces;
+using biblioteca_en_ASP_NET.Models;
 
 namespace biblioteca_en_ASP_NET.Repositorios
 {
     public class PrestamoRepositorio : IPrestamoRepositorio
     {
-        private static List<Prestamo> prestamos = new List<Prestamo>();
-        private readonly LibroRepositorio libroRepo = new LibroRepositorio();
-        private readonly UsuarioRepositorio usuarioRepo = new UsuarioRepositorio();
+        private readonly string _connectionString;
+
+        public PrestamoRepositorio()
+        {
+            _connectionString = ConfigurationManager.ConnectionStrings["ConexionSQL"].ConnectionString;
+        }
 
         public IEnumerable<Prestamo> ObtenerPrestamos()
         {
-            // Asignamos las propiedades de navegación Libro y Usuario
-            foreach (var p in prestamos)
+            var lista = new List<Prestamo>();
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                p.Libro = libroRepo.ObtenerPorId(p.LibroId);
-                p.Usuario = usuarioRepo.ObtenerPorId(p.UsuarioId);
+                con.Open();
+                string query = @"SELECT p.Id, p.UsuarioId, p.LibroId, p.FechaPrestamo, p.FechaDevolucion, 
+                                        l.Titulo AS LibroTitulo, u.Nombre AS UsuarioNombre
+                                 FROM Prestamos p
+                                 INNER JOIN Libros l ON p.LibroId = l.Id
+                                 INNER JOIN Usuarios u ON p.UsuarioId = u.Id";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        lista.Add(new Prestamo
+                        {
+                            Id = (int)dr["Id"],
+                            UsuarioId = (int)dr["UsuarioId"],
+                            LibroId = (int)dr["LibroId"],
+                            FechaPrestamo = (DateTime)dr["FechaPrestamo"],
+                            FechaDevolucion = (DateTime)dr["FechaDevolucion"],
+                            Libro = new Libro { Titulo = dr["LibroTitulo"].ToString() },
+                            Usuario = new Usuario { Nombre = dr["UsuarioNombre"].ToString() }
+                        });
+                    }
+                }
             }
-            return prestamos;
+
+            return lista;
         }
 
-        public Prestamo ObtenerPorId(int id)
+        public void CrearPrestamo(Prestamo prestamo)
         {
-            var p = prestamos.FirstOrDefault(x => x.Id == id);
-            if (p != null)
+            using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                p.Libro = libroRepo.ObtenerPorId(p.LibroId);
-                p.Usuario = usuarioRepo.ObtenerPorId(p.UsuarioId);
+                con.Open();
+                string query = @"INSERT INTO Prestamos (UsuarioId, LibroId, FechaPrestamo, FechaDevolucion)
+                                 VALUES (@UsuarioId, @LibroId, @FechaPrestamo, @FechaDevolucion)";
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@UsuarioId", prestamo.UsuarioId);
+                    cmd.Parameters.AddWithValue("@LibroId", prestamo.LibroId);
+                    cmd.Parameters.AddWithValue("@FechaPrestamo", prestamo.FechaPrestamo);
+                    cmd.Parameters.AddWithValue("@FechaDevolucion", prestamo.FechaDevolucion);
+                    cmd.ExecuteNonQuery();
+                }
             }
-            return p;
-        }
-
-        public void AgregarPrestamo(Prestamo prestamo)
-        {
-            prestamo.Id = prestamos.Count > 0 ? prestamos.Max(p => p.Id) + 1 : 1;
-            prestamos.Add(prestamo);
-        }
-
-        public void ActualizarPrestamo(Prestamo prestamo)
-        {
-            var p = ObtenerPorId(prestamo.Id);
-            if (p != null)
-            {
-                p.LibroId = prestamo.LibroId;
-                p.UsuarioId = prestamo.UsuarioId;
-                p.FechaPrestamo = prestamo.FechaPrestamo;
-                p.FechaDevolucion = prestamo.FechaDevolucion;
-            }
-        }
-
-        public void EliminarPrestamo(int id)
-        {
-            var p = ObtenerPorId(id);
-            if (p != null) prestamos.Remove(p);
         }
     }
 }

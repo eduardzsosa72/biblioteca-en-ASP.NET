@@ -1,5 +1,5 @@
-﻿using biblioteca_en_ASP_NET.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using biblioteca_en_ASP_NET.Models;
 
 namespace biblioteca_en_ASP_NET.Interfaces
 {
@@ -7,12 +7,8 @@ namespace biblioteca_en_ASP_NET.Interfaces
     {
         Usuario ValidarUsuario(string correo, string password);
         IEnumerable<Usuario> ObtenerUsuarios();
-
-        // Métodos nuevos para registro
+        Usuario ObtenerPorId(int id);
         int CrearPersona(Persona persona);
         void CrearUsuario(Usuario usuario);
-
-        // Método para buscar usuario por Id
-        Usuario ObtenerPorId(int id);
     }
 }
